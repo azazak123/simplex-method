@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Math.SimplexMethod (step, simplexMethod, toTable) where
+module Math.SimplexMethod (step, simplexMethod, toTable, getSolution) where
 
 import Data.Foldable (find)
 import Data.List (transpose)
@@ -27,7 +27,7 @@ simplexMethod a symbols b c = loop initial
           nonBasis = [1 .. length c + greaterNumber],
           table,
           initialFunc = c,
-          limited = False
+          limited = True
         }
     table = transpose (transpose a ++ greaterColumns ++ [b]) ++ [fmap negate newC]
     newC = foldl1 (zipWith (+)) a ++ replicate greaterNumber (-1) ++ [sum b]
@@ -37,6 +37,26 @@ simplexMethod a symbols b c = loop initial
         . filter ((== ">=") . snd)
         . zip [0 ..]
         $ symbols
+
+-- | Get solution
+getSolution :: RealFrac a => Simplex a -> [a]
+getSolution Simplex {basis, table, initialFunc, limited}
+  | not limited = []
+  | otherwise =
+      roundToDigit (10 :: Int)
+        . (\i -> solutions !! (subtract 1 . fromJust . find (== i + 1) $ basis))
+        <$> [ 0
+              .. subtract 1
+                . length
+                . filter (/= 0)
+                $ initialFunc
+            ]
+  where
+    solutions =
+      init
+        . last
+        . transpose
+        $ table
 
 -- | Loops which makes steps while Simplex is changeable
 loop :: RealFrac a => Simplex a -> Simplex a
@@ -74,8 +94,8 @@ step initial@Simplex {basis, nonBasis, table, initialFunc}
              $ transpose table
          ) =
       initial
-  | indexes == (-1, -1) = initial {limited = True}
-  | otherwise = Simplex {basis = newBasis, nonBasis = newNonBasis, table = newTable, initialFunc, limited = False}
+  | indexes == (-1, -1) = initial {limited = False}
+  | otherwise = Simplex {basis = newBasis, nonBasis = newNonBasis, table = newTable, initialFunc, limited = True}
   where
     isMinusFree = or . fmap checkMinusFree $ init table
     isMinusFunc = or . fmap checkMinusFunc . init $ transpose table
@@ -135,7 +155,7 @@ step initial@Simplex {basis, nonBasis, table, initialFunc}
 toTable :: (Show a, RealFrac a) => Simplex a -> String
 toTable Simplex {basis, nonBasis, table, initialFunc, limited} =
   ( ++
-      ( if not limited
+      ( if limited
           then "Maximum = " ++ show result
           else "Not limited"
       )

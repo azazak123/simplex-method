@@ -83,4 +83,5 @@ test-suite simplex-method-test
     main-is:          MyLibTest.hs
 
     -- Test dependencies.
-    build-depends:    base ^>=4.16.3.0
+    build-depends:    base ^>=4.16.3.0,
+                      simplex-method
