@@ -15,3 +15,6 @@ determinant _ = 0
 
 roundToDigit :: (Integral b, RealFrac a) => b -> a -> a
 roundToDigit n number = (/ 10 ^ n) . fromInteger . round $ 10 ^ n * number
+
+defaultRound :: (RealFrac a) => a -> a
+defaultRound = roundToDigit (10 :: Int)
