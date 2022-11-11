@@ -16,16 +16,21 @@ type FreeElements a = [a]
 
 type FunctionCoefficients a = [a]
 
-{- Start simplex method
-Example:
-simplexMethod [[5, -2],[-1, 2],[1,1]] ["<=","<=",">="] [7,5,6] [1,2] means:
-
-  5x1 - 2x2 <= 7
-  -x1 + 2x2 <= 5
-  x1 + x2 >= 6
-
-  f(x1,x2) = x1 + 2x2
--}
+-- | Start simplex method
+--
+-- Example:
+--
+-- > simplexMethod [[5, -2],[-1, 2],[1,1]] ["<=","<=","\>="] [7,5,6] [1,2]
+-- means:
+--
+-- 5x1 - 2x2 <= 7
+--
+-- \-x1 + 2x2 <= 5
+--
+-- x1 + x2 >= 6
+--
+--
+-- f(x1,x2) = x1 + 2x2
 simplexMethod ::
   (RealFrac a, Enum a) =>
   ConstraintCoefficients a ->
@@ -62,7 +67,7 @@ simplexMethod coeffs symbols free func = loop initial
     basisStart = length func + greaterNumber
     greaterNumber = length . filter (== ">=") $ symbols
 
--- | Get solution
+-- | Get solution from Simplex
 getSolution :: RealFrac a => Simplex a -> [a]
 getSolution Simplex {basis, table, initialFunc, limited}
   | not limited = []
