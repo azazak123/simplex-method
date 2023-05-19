@@ -44,9 +44,6 @@ maintainer:         azazaka2002@gmail.com
 -- copyright:
 category:           Math
 
--- Extra files to be distributed with the package, such as examples or a README.
-extra-source-files: CHANGELOG.md
-
 library
     -- Modules exported by the library.
     exposed-modules: Math.SimplexMethod
